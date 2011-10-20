@@ -9,7 +9,8 @@ The library is done so it's simpler to do some script for forumotion forum.
 * [tid](#f-tid)
 * [trash](#f-trash)
 
-## TC.move(topic_number , forum_number [, success])<a name="f-move"></a>
+<a name="f-move"></a>
+## TC.move(topic_number , forum_number [, success])
 
 ### Parameters
 **topic_number :** id of the topic
@@ -20,7 +21,8 @@ nothing
 ### Description
 Move the given topic to the given forum
 
-## TC.pdelete(post_number [, success])<a name="f-pdelete"></a>
+<a name="f-pdelete"></a>
+## TC.pdelete(post_number [, success])
 
 ### Parameters
 **post_number :** id of the post
@@ -29,8 +31,9 @@ Move the given topic to the given forum
 nothing
 ### Description
 Delete the gven post
- 
-## TC.tdelete(topic_number , forum_number [, success])<a name="f-tdelete"></a>
+
+<a name="f-tdelete"></a>
+## TC.tdelete(topic_number , forum_number [, success])
 
 ### Parameters
 **topic_number :** id of the topic
@@ -41,7 +44,8 @@ nothing
 ### Description
 Delete topic with the given number
 
-## TC.tid()<a name="f-tid"></a> 
+<a name="f-tid"></a> 
+## TC.tid()
 
 ### Parameters
 none
@@ -50,8 +54,8 @@ none
 ### Description
 Get the tid
 
-
-## TC.trash(topic_number [, success])<a name="f-trash"></a> 
+<a name="f-trash"></a> 
+## TC.trash(topic_number [, success])
 
 ### Parameters
 **topic_number :** id of the topic
