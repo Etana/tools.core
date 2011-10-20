@@ -13,9 +13,9 @@ The library is done so it's simpler to do some script for forumotion forum.
 ## TC.move(topic_number , forum_number [, success])
 
 ### Parameters
-**topic_number :** id of the topic
-**forum_number :** forum where topic must be moved
-**success :** function to execute when topic is moved
+* **topic_number :** id of the topic
+* **forum_number :** forum where topic must be moved
+* **success :** function to execute when topic is moved
 ### Returns
 nothing
 ### Description
@@ -25,8 +25,8 @@ Move the given topic to the given forum
 ## TC.pdelete(post_number [, success])
 
 ### Parameters
-**post_number :** id of the post
-**success :** function to execute when post is deleted
+* **post_number :** id of the post
+* **success :** function to execute when post is deleted
 ### Returns
 nothing
 ### Description
@@ -35,14 +35,16 @@ Delete the gven post
 <a name="f-tdelete"></a>
 ## TC.tdelete(topic_number , forum_number [, success])
 
-### Parameters
-**topic_number :** id of the topic
-**forum_number :** forum of the topic
-**success :** function to execute when topic is deleted
+##
+# Parameters
+* **topic_number :** id of the topic
+* **forum_number :** forum of the topic
+* **success :** function to execute when topic is deleted
 ### Returns
 nothing
 ### Description
 Delete topic with the given number
+
 
 <a name="f-tid"></a> 
 ## TC.tid()
@@ -50,7 +52,7 @@ Delete topic with the given number
 ### Parameters
 none
 ### Returns
-**string :** tid or "" if unreachable
+* **string :** tid or "" if unreachable
 ### Description
 Get the tid
 
@@ -58,8 +60,8 @@ Get the tid
 ## TC.trash(topic_number [, success])
 
 ### Parameters
-**topic_number :** id of the topic
-**success :** function to execute when topic is trashed
+* **topic_number :** id of the topic
+* **success :** function to execute when topic is trashed
 ### Returns
 nothing
 ### Description
