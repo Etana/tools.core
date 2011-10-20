@@ -1,9 +1,6 @@
 var TC= {
 	tid				: function() {
-		return $("input[name=tid]:first").val()	
-	},
-	tpost			: function(p,e) {
-		/* en cours : code pour poster un sujet */
+		return $("input[name=tid]:first").val() ||  ($("a[href*='&tid=']:first").attr("href")||"").replace(/^.*&tid=([a-z0-9]*)?.*$/,"$1")	
 	},
 	pdelete		: function(p,e) {
 		$.post("/post",{p:p,mode:"delete",confirm:""},e);
