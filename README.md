@@ -3,8 +3,13 @@ Use of the library
 
 The library is done so it's simpler to do some script for forumotion forum.
 
+* [move](#f-move)
+* [pdelete](#f-pdelete)
+* [tdelete](#f-tdelete)
+* [tid](#f-tid)
+* [trash](#f-trash)
 
-## TC.move(topic_number , forum_number [, success]) 
+	TC.move(topic_number , forum_number [, success])<a name="f-move"></a>
 
 ### Parameters
 **topic_number :** id of the topic
@@ -15,7 +20,7 @@ nothing
 ### Description
 Move the given topic to the given forum
 
-## TC.pdelete(post_number [, success])
+	TC.pdelete(post_number [, success])<a name="f-pdelete"></a>
 
 ### Parameters
 **post_number :** id of the post
@@ -25,7 +30,7 @@ nothing
 ### Description
 Delete the gven post
  
-## TC.tdelete(topic_number , forum_number [, success])
+	TC.tdelete(topic_number , forum_number [, success])<a name="f-tdelete"></a>
 
 ### Parameters
 **topic_number :** id of the topic
@@ -36,7 +41,7 @@ nothing
 ### Description
 Delete topic with the given number
 
-## TC.tid() 
+	TC.tid()<a name="f-tid"></a> 
 
 ### Parameters
 none
@@ -45,7 +50,7 @@ none
 ### Description
 Get the tid
 
-## TC.trash(topic_number [, success]) 
+	TC.trash(topic_number [, success])<a name="f-trash"></a> 
 
 ### Parameters
 **topic_number :** id of the topic
