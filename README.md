@@ -22,6 +22,7 @@ The library is done so it's simpler to do some script for forumotion forum.
 * [FA.post](#FA.post)
 * [FA.post.do](#FA.post.do)
 * [FA.post.do.delete](#FA.post.do.delete)
+* [FA.post.do.get](#FA.post.do.get)
 * [FA.topic](#FA.topic)
 * [FA.topic.do](#FA.topic.do)
 * [FA.topic.do.split](#FA.topic.do.split)
@@ -200,6 +201,19 @@ Delete the given post
 #### Parameters
 * **post\_number :** id of the post
 * **success :** function to execute when post is deleted
+
+#### Returns
+Nothing
+
+<a name="FA.post.do.get"></a>
+## FA.post.do.get(post\_number , success)
+
+### Description
+Get content of an editable post, content is given as parameter of given function success ( if post not editable, "" is given )
+
+#### Parameters
+* **post\_number :** id of the post
+* **success :** function to execute when post is got
 
 #### Returns
 Nothing
