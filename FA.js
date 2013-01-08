@@ -62,6 +62,13 @@ var FA;
       {
         delete: function(p,e) {
           $.post("/post",{p:p,mode:"delete",confirm:""},e);
+        },
+        get: function(p,e) {
+          $.get('/post?p='+p+'&mode=editpost', function(d){
+            var r= d.replace(/^[\s\S]*<textarea id="text_editor_textarea"[^>]*>([\s\S]*?)<\/textarea>.*[\s\S]*$/,'$1');
+            if(r==d) e("");
+            else e(r)
+          })
         }
       }
     },
