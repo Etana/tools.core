@@ -4,33 +4,30 @@ Use of the library
 The library is done so it's simpler to do some script for forumotion forum.
 
 * [FA](#FA)
-* [FA.util](#FA.util)
-* [FA.util.ver](#FA.util.ver)
-* [FA.util.tid](#FA.util.tid)
 * [FA.page](#FA.page)
-* [FA.page.info](#FA.page.info)
-* [FA.page.info.type](#FA.page.info.type)
+* [FA.page.type](#FA.page.type)
 * [FA.user](#FA.user)
-* [FA.user.info](#FA.user.info)
-* [FA.user.info.rank](#FA.user.info.rank)
-* [FA.user.info.logged](#FA.user.info.logged)
-* [FA.user.info.admin](#FA.user.info.admin)
-* [FA.user.info.mod](#FA.user.info.mod)
+* [FA.user.id](#FA.user.id)
+* [FA.user.sid](#FA.user.sid)
+* [FA.user.tid](#FA.user.tid)
+* [FA.user.aid](#FA.user.aid)
+* [FA.user.name](#FA.user.name)
+* [FA.user.rank](#FA.user.rank)
+* [FA.user.logged](#FA.user.logged)
+* [FA.user.admin](#FA.user.admin)
+* [FA.user.mod](#FA.user.mod)
 * [FA.pm](#FA.pm)
-* [FA.pm.do](#FA.pm.do)
-* [FA.pm.do.send](#FA.pm.do.send)
+* [FA.pm.send](#FA.pm.send)
 * [FA.post](#FA.post)
-* [FA.post.do](#FA.post.do)
-* [FA.post.do.remove](#FA.post.do.remove)
-* [FA.post.do.get](#FA.post.do.get)
+* [FA.post.remove](#FA.post.remove)
+* [FA.post.get](#FA.post.get)
 * [FA.topic](#FA.topic)
-* [FA.topic.do](#FA.topic.do)
-* [FA.topic.do.split](#FA.topic.do.split)
-* [FA.topic.do.split\_beyond](#FA.topic.do.split\_beyond)
-* [FA.topic.do.remove](#FA.topic.do.remove)
-* [FA.topic.do.trash](#FA.topic.do.trash)
-* [FA.topic.do.move](#FA.topic.do.move)
-* [FA.topic.do.reply](#FA.topic.do.reply)
+* [FA.topic.split](#FA.topic.split)
+* [FA.topic.split\_beyond](#FA.topic.split\_beyond)
+* [FA.topic.remove](#FA.topic.remove)
+* [FA.topic.trash](#FA.topic.trash)
+* [FA.topic.move](#FA.topic.move)
+* [FA.topic.reply](#FA.topic.reply)
 
 <a name="FA"></a>
 ## FA
@@ -38,44 +35,14 @@ The library is done so it's simpler to do some script for forumotion forum.
 ### Description
 The base object
 
-<a name="FA.util"></a>
-## FA.util
-
-### Description
-Object containing utility method
-
-<a name="FA.util.ver"></a>
-## FA.util.ver
-
-### Description
-Variable being version of tools core
-
-<a name="FA.util.tid"></a>
-## FA.util.tid()
-
-### Description
-Method returning tid
-
-#### Parameters
-None
-
-#### Returns
-String with tid or empty string if not accessible
-
 <a name="FA.page"></a>
 ## FA.page
 
 ### Description
 Object about current page
 
-<a name="FA.page.info"></a>
-## FA.page.info
-
-### Description
-Object about info on current page
-
-<a name="FA.page.info.type"></a>
-## FA.page.info.type()
+<a name="FA.page.type"></a>
+## FA.page.type()
 
 ### Description
 Method returing type of page
@@ -84,7 +51,11 @@ Method returing type of page
 None
 
 #### Returns
-A string indicating the type of page or an empty string
+A string indicating the type of page or an empty string, value can be:
+* **viewtopic :** topic displaying page
+* **viewforum :** forum displaying page
+* **index :** index of forum page
+* **viewcategory :** category displaying page
 
 <a name="FA.user"></a>
 ## FA.user
@@ -92,14 +63,68 @@ A string indicating the type of page or an empty string
 ### Description
 Object about user viewing the page
 
-<a name="FA.user.info"></a>
-## FA.user.info
+<a name="FA.user.id"></a>
+## FA.user.id()
 
 ### Description
-Object about info on user viewing the page
+Method returning id of user viewing page
 
-<a name="FA.user.info.rank"></a>
-## FA.user.info.rank()
+#### Parameters
+None
+
+#### Returns
+Integer identifying the user ( 0 if user is guest )
+
+<a name="FA.user.sid"></a>
+## FA.user.sid()
+
+### Description
+Method returning sid of user viewing page
+
+#### Parameters
+None
+
+#### Returns
+The user sid or an empty string if user is guest
+
+<a name="FA.user.tid"></a>
+## FA.user.tid()
+
+### Description
+Method returning tid of user viewing page
+
+#### Parameters
+None
+
+#### Returns
+The tid if available on the page, else an empty string
+
+<a name="FA.user.aid"></a>
+## FA.user.id()
+
+### Description
+Method returning autologin id of user viewing page
+
+#### Parameters
+None
+
+#### Returns
+Autologin id if there is one, else an empty string
+
+<a name="FA.user.name"></a>
+## FA.user.name()
+
+### Description
+Method returning name of user viewing page
+
+#### Parameters
+None
+
+#### Returns
+The username if available in logout button, else an empty string
+
+<a name="FA.user.rank"></a>
+## FA.user.rank()
 
 ### Description
 Method returning rank of user viewing page
@@ -114,8 +139,8 @@ Integer :
 * **2 :** viewer is member which has moderation privilege on current page
 * **3 :** viewer is administrator
 
-<a name="FA.user.info.logged"></a>
-## FA.user.info.logged()
+<a name="FA.user.logged"></a>
+## FA.user.logged()
 
 ### Description
 Method testing the logged status of current user
@@ -127,8 +152,8 @@ None
 * **true :** if member is logged in
 * **false :** if member is logged out
 
-<a name="FA.user.info.admin"></a>
-## FA.user.info.admin()
+<a name="FA.user.admin"></a>
+## FA.user.admin()
 
 ### Description
 Method testing if the current user is admin
@@ -140,8 +165,8 @@ None
 * **true :** if member is admin
 * **false :** if member is not admin
 
-<a name="FA.user.info.mod"></a>
-## FA.user.info.mod()
+<a name="FA.user.mod"></a>
+## FA.user.mod()
 
 ### Description
 Method testing if the current user can mod current page
@@ -159,14 +184,8 @@ None
 ### Description
 Object about private message
 
-<a name="FA.pm.do"></a>
-## FA.pm.do
-
-### Description
-Object about action for private message
-
-<a name="FA.pm.do.send"></a>
-## FA.pm.do.send([username1, ...], subject, message [, success])
+<a name="FA.pm.send"></a>
+## FA.pm.send([username1, ...], subject, message [, success])
 
 ### Description
 Method sending a private message
@@ -186,14 +205,8 @@ Nothing
 ### Description
 Object about post
 
-<a name="FA.post.do"></a>
-## FA.post.do
-
-### Description
-Object about action on post
-
-<a name="FA.post.do.remove"></a>
-## FA.post.do.remove(post\_number [, success])
+<a name="FA.post.remove"></a>
+## FA.post.remove(post\_number [, success])
 
 ### Description
 Delete the given post
@@ -205,8 +218,8 @@ Delete the given post
 #### Returns
 Nothing
 
-<a name="FA.post.do.get"></a>
-## FA.post.do.get(post\_number , success)
+<a name="FA.post.get"></a>
+## FA.post.get(post\_number , success)
 
 ### Description
 Get content of an editable post, content is given as parameter of given function success ( if post not editable, "" is given )
@@ -224,14 +237,8 @@ Nothing
 ### Description
 Object about topic
 
-<a name="FA.topic.do"></a>
-## FA.topic.do
-
-### Description
-Object about action on topics
-
-<a name="FA.topic.do.split"></a>
-## FA.topic.do.split(subject, new\_forum, [post1, ...], old\_forum [, success])
+<a name="FA.topic.split"></a>
+## FA.topic.split(subject, new\_forum, [post1, ...], old\_forum [, success])
 
 ### Description
 Split message from a topic in a new topic
@@ -246,8 +253,8 @@ Split message from a topic in a new topic
 #### Returns
 Nothing
 
-<a name="FA.topic.do.split_beyond"></a>
-## FA.topic.do.split\_beyond(subject, new\_forum, [post1, ...], old\_forum [, success])
+<a name="FA.topic.split_beyond"></a>
+## FA.topic.split\_beyond(subject, new\_forum, [post1, ...], old\_forum [, success])
 
 ### Description
 Split message beyond a given post from a topic in a new topic
@@ -262,22 +269,21 @@ Split message beyond a given post from a topic in a new topic
 #### Returns
 Nothing
 
-<a name="FA.topic.do.remove"></a>
-## FA.topic.do.remove(topic\_number , forum\_number [, success])
+<a name="FA.topic.remove"></a>
+## FA.topic.remove(topic\_number [, success])
 
 ### Description
 Delete topic with the given number
 
 #### Parameters
 * **topic\_number :** id of the topic
-* **forum\_number :** forum of the topic
 * **success :** function to execute when topic is deleted
 
 #### Returns
 Nothing
 
-<a name="FA.topic.do.trash"></a> 
-## FA.topic.do.trash(topic\_number [, success])
+<a name="FA.topic.trash"></a> 
+## FA.topic.trash(topic\_number [, success])
 
 ### Description
 Move the given topic to the trash
@@ -289,8 +295,8 @@ Move the given topic to the trash
 #### Returns
 Nothing
 
-<a name="FA.topic.do.move"></a>
-## FA.topic.do.move(topic\_number, forum\_number [, success])
+<a name="FA.topic.move"></a>
+## FA.topic.move(topic\_number, forum\_number [, success])
 
 ### Description
 Move a given topic to a given forum
@@ -303,8 +309,8 @@ Move a given topic to a given forum
 #### Returns
 Nothing
 
-<a name="FA.topic.do.reply"></a>
-## FA.topic.do.reply(topic\_number,  message [, success])
+<a name="FA.topic.reply"></a>
+## FA.topic.reply(topic\_number,  message [, success])
 
 ### Description
 Reply to a given topic with a given message
