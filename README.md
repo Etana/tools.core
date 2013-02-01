@@ -21,13 +21,13 @@ The library is done so it's simpler to do some script for forumotion forum.
 * [FA.pm.do.send](#FA.pm.do.send)
 * [FA.post](#FA.post)
 * [FA.post.do](#FA.post.do)
-* [FA.post.do.delete](#FA.post.do.delete)
+* [FA.post.do.remove](#FA.post.do.remove)
 * [FA.post.do.get](#FA.post.do.get)
 * [FA.topic](#FA.topic)
 * [FA.topic.do](#FA.topic.do)
 * [FA.topic.do.split](#FA.topic.do.split)
 * [FA.topic.do.split\_beyond](#FA.topic.do.split\_beyond)
-* [FA.topic.do.delete](#FA.topic.do.delete)
+* [FA.topic.do.remove](#FA.topic.do.remove)
 * [FA.topic.do.trash](#FA.topic.do.trash)
 * [FA.topic.do.move](#FA.topic.do.move)
 * [FA.topic.do.reply](#FA.topic.do.reply)
@@ -192,8 +192,8 @@ Object about post
 ### Description
 Object about action on post
 
-<a name="FA.post.do.delete"></a>
-## FA.post.do.delete(post\_number [, success])
+<a name="FA.post.do.remove"></a>
+## FA.post.do.remove(post\_number [, success])
 
 ### Description
 Delete the given post
@@ -262,8 +262,8 @@ Split message beyond a given post from a topic in a new topic
 #### Returns
 Nothing
 
-<a name="FA.topic.do.delete"></a>
-## FA.topic.do.delete(topic\_number , forum\_number [, success])
+<a name="FA.topic.do.remove"></a>
+## FA.topic.do.remove(topic\_number , forum\_number [, success])
 
 ### Description
 Delete topic with the given number

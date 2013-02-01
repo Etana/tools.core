@@ -60,7 +60,7 @@ var FA;
     {
       do:
       {
-        delete: function(p,e) {
+        remove: function(p,e) {
           $.post("/post",{p:p,mode:"delete",confirm:""},e);
         },
         get: function(p,e) {
@@ -84,8 +84,8 @@ var FA;
           $.post("/modcp?tid="+util.tid(),{subject:s,new_forum_id:"f"+f,split_type_beyond:1,post_id_list:p,tid:util.tid(),f:d,mode:"split"},e);
           // t possible instead of f
         },
-        delete: function(t,f,e) {
-          $.post("/modcp?tid="+util.tid(),{f:f, t:t, tid: util.tid(), mode:"delete",confirm:""},e);
+        remove: function(t,f,e) {
+          $.post("/modcp?tid="+util.tid(),{f:f, t:t, tid: util.tid(), mode:"delete",confirm:1},e);
         },
         trash: function(t,e) {
           $.get("/modcp?mode=trash&t="+t+"&tid="+util.tid(),e)
