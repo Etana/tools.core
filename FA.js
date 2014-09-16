@@ -132,14 +132,14 @@ var $f = $f || {};
   /**
    * $f.send_pm - send a private message
    *
-   * @username: array with recipients usernames
+   * @usernames: array with recipients usernames
    * @subject: subject
    * @message: message content
    * @callback: function called with sended form page as parameter
    */
   /* TODO ADD OTHER FIELDS */
   $f.send_pm = function(usernames, subject, message, callback) {
-    $.post("/privmsg", _param({"username":username, subject:subject, message:message, mode:"post", post:1}), e);
+    $.post("/privmsg", _param({"username":usernames, subject:subject, message:message, mode:"post", post:1}), callback);
   };
 
   /**
@@ -198,12 +198,12 @@ var $f = $f || {};
    * @old_topic_id: id of topic in which messages are currently
    * @callback: function called with sended form page as parameter
    */
-  $f.split_topic = function(new_title, new_forum_id, posts_id, old_topic_id, split_beyond, callback) {
-    var data = {subject:new_title, new_forum_id:"f" + new_forum_id, post_id_list:posts_id, t:old_topic_id, mode:"split"};
-    data["split_type_"+(split_beyond?"beyond":"all")]= 1;
-    if (typeof p != "object") {
-      p = [p];
+  $f.split_topic = function(new_title, new_forum_id, posts_ids, old_topic_id, split_beyond, callback) {
+    if (typeof posts_ids != "object") {
+      posts_ids = [posts_ids];
     }
+    var data = {subject:new_title, new_forum_id:"f" + new_forum_id, post_id_list:posts_ids, t:old_topic_id, mode:"split"};
+    data["split_type_"+(split_beyond?"beyond":"all")]= 1;
     $.post("/modcp?tid=" + $f.tid, data, callback);
   };
 
