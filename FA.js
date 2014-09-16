@@ -58,6 +58,7 @@ var $f = $f || {};
      *  - "viewcategory" if viewing category,
      *  - empty string "" otherwise
      */
+
     $f.page_type = (function() {
           var p= location.pathname;
           if(/^\/t[1-9][0-9]*(p[1-9][0-9]*)?-/.test(p)) return "viewtopic";
@@ -67,6 +68,20 @@ var $f = $f || {};
           return "";
     })();
 
+    $f.page_id = (function() {
+          var p= location.pathname;
+          var m = p.match(/^\/[tfc]([1-9][0-9]*)(p[1-9][0-9]*)?-/);
+          if(!m) m = p.match(/^\/u([1-9][0-9]*)[a-z]*$/);
+          if(!m) return 0;
+          return +m[1]
+    })();
+
+    $f.page_num = (function() {
+          var p= location.pathname;
+          var m = p.match(/^\/[tf][1-9][0-9]*(p[1-9][0-9]*)-/);
+          if(!m) return 0;
+          return +m[1]
+    })();
 
     /**
      * $f.charset - charset of current page
@@ -93,7 +108,7 @@ var $f = $f || {};
      * Identifiant de l'utilisateur.
      * @returns {Number} 0 si l'utilisateur est déconnecté, son identifiant autrement.
      */
-    $f.userid = function(){
+    $f.user_id = function(){
       if(_ud["user_id"]!==null)
         return _ud["user_id"]
       return parseInt((my_getcookie('fa_'+location.hostname.replace(/\./g,'_')+'_data')||"0").replace(/.*s:6:"userid";(i:([0-9]+)|s:[0-9]+:"([0-9]+)");.*/,'$2$3'))
@@ -119,47 +134,19 @@ var $f = $f || {};
      * Nom de l'utilisateur.
      * @returns {String} Le pseudo de l'utilisateur si disponible, une chaîne vide sinon.
      */
-    $f.username = function(){
+    $f.user_name = function(){
       if(_ud["username"]!==null)
         return _ud["username"]
       return ($('#i_icon_mini_logout').attr('title')||"").replace(/^.*? \[ (.*) \]$/,'$1')
     };
 
-    /**
-     * Niveau de l'utilisateur.
-     * @returns {Number} Le niveau de l'utilisateur :<ul><li>3 : administrateur</li><li>2 : modérateur</li><li>1 : membre</li><li>0 : invité</li></ul>
-     */
-    $f.userlevel = function(){
-      if(_ud["user_level"]!==null)
-        return _ud["user_level"]
-      if($f.user.logged())
-      {
-        if($f.user.admin()) return 3;
-        if($f.user.mod()) return 2;
-        return 1;
-      }
-      return 0;
-    };
-
-    /**
-     * État de connexion de l'utilisateur.
-     * @returns {Number} 1 si connecté, 0 sinon.
-     */
-    $f.user_is_guest = function(){
-      if(_ud["session_logged_in"]!==null)
-        return !_ud["session_logged_in"]
-      return $("#logout").length!=1;
-    };
+    $f.user_is_guest = (_ud["session_logged_in"]!==null ? !_ud["session_logged_in"] : $("#logout").length!=1);
 
     /**
      * Statut d'administrateur de l'utilisateur.
      * @returns {Number} 1 si administrateur, 0 sinon.
      */
-    $f.user_is_admin = function(){
-      if(_ud["user_level"]!==null)
-        return _ud["user_level"]==1
-      return $("a[href='/admin/index.forum?part=admin&tid="+$f.user_tid()+"']").length==1;
-    };
+    $f.user_is_admin = (_ud["user_level"]!==null ? _ud["user_level"]==1 : $("a[href='/admin/index.forum?part=admin&tid="+$f.user_tid()+"']").length==1);
 
     /**
      * Statut de modérateur de l'utilisateur.
@@ -218,7 +205,7 @@ var $f = $f || {};
      */
     $f.reply_topic= function(topic_id, message, callback) {
       $.post("/post",{subject:"",message:message,mode:"reply",t:topic_id,post:1,notify:0},callback);
-    },
+    };
 
     /**
      * Diviser des messages dans un nouveau sujet.
