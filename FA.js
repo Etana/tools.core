@@ -1,226 +1,258 @@
 var $f = $f || {};
-
-(function(){
-    var _param = function(obj, modifier) {
-      var buildParams= function(prefix, obj, traditional, add) {
-        var name;
-        if (jQuery.isArray(obj)) {
-          jQuery.each(obj, function(i, v) {
-            if (traditional || rbracket.test(prefix)) {
-              add(prefix, v);
-            } else {
-              buildParams(prefix + "[" + (typeof v === "object" ? i : "") + "]", v, traditional, add);
-            }
-          });
-        } else {
-          if (!traditional && jQuery.type(obj) === "object") {
-            for (name in obj) {
-              buildParams(prefix + "[" + name + "]", obj[name], traditional, add);
-            }
+(function() {
+  var _param = function(obj, modifier) {
+    var buildParams = function(prefix, obj, traditional, add) {
+      var name;
+      if (jQuery.isArray(obj)) {
+        jQuery.each(obj, function(i, v) {
+          if (traditional || rbracket.test(prefix)) {
+            add(prefix, v);
           } else {
-            add(prefix, obj);
+            buildParams(prefix + "[" + (typeof v === "object" ? i : "") + "]", v, traditional, add);
           }
-        }
-      }
-      var prefix, s = [], add = function(key, value) {
-        if(modifier)
-          if((value=modifier(key, value)) === undefined)
-            return;
-
-        value = jQuery.isFunction(value) ? value() : value == null ? "" : value;
-        s[s.length] = _encodeURIComponent(key) + "=" + _encodeURIComponent(value);
-      };
-      if (jQuery.isArray(obj) || obj.jquery && !jQuery.isPlainObject(obj)) {
-        jQuery.each(obj, function() {
-          add(this.name, this.value);
         });
       } else {
-        for (prefix in obj) {
-          buildParams(prefix, obj[prefix], undefined, add);
+        if (!traditional && jQuery.type(obj) === "object") {
+          for (name in obj) {
+            buildParams(prefix + "[" + name + "]", obj[name], traditional, add);
+          }
+        } else {
+          add(prefix, obj);
         }
       }
-      return s.join("&").replace(/%20/g, "+");
-    }, _encodeURIComponent= function(str) {
-      if($f.charset!='UTF-8')
-        return encodeURIComponent(escape(str).replace(/%u[A-F0-9]{4}/g, function(x){ return "&#"+parseInt(x.substr(2),16)+";"; })).replace(/%25/g,'%');
-      else
-        return encodeURIComponent(str)
     };
+    var prefix, s = [], add = function(key, value) {
+      if (modifier) {
+        if ((value = modifier(key, value)) === undefined) {
+          return;
+        }
+      }
+      value = jQuery.isFunction(value) ? value() : value == null ? "" : value;
+      s[s.length] = _encodeURIComponent(key) + "=" + _encodeURIComponent(value);
+    };
+    if (jQuery.isArray(obj) || obj.jquery && !jQuery.isPlainObject(obj)) {
+      jQuery.each(obj, function() {
+        add(this.name, this.value);
+      });
+    } else {
+      for (prefix in obj) {
+        buildParams(prefix, obj[prefix], undefined, add);
+      }
+    }
+    return s.join("&").replace(/%20/g, "+");
+  }, _encodeURIComponent = function(str) {
+    if ($f.charset != "UTF-8") {
+      return encodeURIComponent(escape(str).replace(/%u[A-F0-9]{4}/g, function(x) {
+        return "&#" + parseInt(x.substr(2), 16) + ";";
+      })).replace(/%25/g, "%");
+    } else {
+      return encodeURIComponent(str);
+    }
+  }, _ud = _userdata || {};
 
+  /**
+   * $f.page_type - get type of current page
+   * 
+   * Return: topic, forum, index, category, empty string otherweise 
+   */
+  $f.page_type = function() {
+    var p = location.pathname;
+    if (/^\/t[1-9][0-9]*(p[1-9][0-9]*)?-/.test(p)) {
+      return "topic";
+    }
+    if (/^\/f[1-9][0-9]*(p[1-9][0-9]*)?-/.test(p)) {
+      return "forum";
+    }
+    if ($("#i_icon_mini_index").parent().attr("href") == p) {
+      return "index";
+    }
+    if (/^\/c[1-9][0-9]*-/.test(p)) {
+      return "category";
+    }
+    return "";
+  }();
+
+  /**
+   * $f.id - resource id of current page
+   * 
+   * Return: id of item showed in current page, 0 otherweise
+   */
+  $f.id = function() {
+    var p = location.pathname;
+    var m = p.match(/^\/[tfc]([1-9][0-9]*)(p[1-9][0-9]*)?-/);
+    if (!m) {
+      m = p.match(/^\/u([1-9][0-9]*)[a-z]*$/);
+    }
+    if (!m) {
+      return 0;
+    }
+    return+m[1];
+  }();
+
+  /**
+   * $f.page_num - page number of current page
+   * 
+   * Return: page number or zero
+   */
+  $f.page_num = function() {
+    var p = location.pathname;
+    var m = p.match(/^\/[tf][1-9][0-9]*(p[1-9][0-9]*)-/);
+    if (!m) {
+      return 0;
+    }
+    return+m[1];
+  }();
+
+  /**
+   * $f.charset - charset of current page
+   *
+   * Return: forum charset in uppercase (e.g., UTF-8, WINDOWS-1252, ISO-8859-1)
+   */
+  $f.charset = (document.charset ? document.charset : document.characterSet).toUpperCase();
+
+  /**
+   * $f.user_id - id of user
+   *
+   * Return: user id, -1 if guest
+   */
+  $f.user_id = _ud["user_id"];
+
+    /**
+     * $f.tid - user temporary identifier
+     *
+     * Return: tid or empty string
+     */
+  $f.tid = $("input[name=tid]:first").val() || ($("a[href*='&tid=']:first").attr("href") || "").replace(/^.*&tid=([a-z0-9]*)?.*$/, "$1");
+
+    /**
+     * $f.username - user username
+     *
+     * Return: username or Anonymous if guest
+     */
+  $f.username = _ud["username"];
+
+    /**
+     * $f.is_guest - is user a guest?
+     *
+     * Return: true if guest, false otherweise
+     */
+  $f.is_guest = !_ud["session_logged_in"];
+
+    /**
+     * $f.is_admin - is user an admin?
+     *
+     * Return: true if admin, false otherweise
+     */
+  $f.is_admin = _ud["user_level"] == 1;
+
+    /**
+     * $f.is_mod - is user a moderator?
+     *
+     * Return: true if moderator or admin, false otherweise
+     */
+  $f.is_mod = _ud["user_level"] > 0;
     
     /**
-     * $f.page_type - get type of current page
-     * 
-     * Return: 
-     *  - "viewtopic" if viewing topic,
-     *  - "viewforum" if viewing forum,
-     *  - "index" if viewing index,
-     *  - "viewcategory" if viewing category,
-     *  - empty string "" otherwise
-     */
-
-    $f.page_type = (function() {
-          var p= location.pathname;
-          if(/^\/t[1-9][0-9]*(p[1-9][0-9]*)?-/.test(p)) return "viewtopic";
-          if(/^\/f[1-9][0-9]*(p[1-9][0-9]*)?-/.test(p)) return "viewforum";
-          if($("#i_icon_mini_index").parent().attr("href")==p) return "index";
-          if(/^\/c[1-9][0-9]*-/.test(p)) return "viewcategory";
-          return "";
-    })();
-
-    $f.page_id = (function() {
-          var p= location.pathname;
-          var m = p.match(/^\/[tfc]([1-9][0-9]*)(p[1-9][0-9]*)?-/);
-          if(!m) m = p.match(/^\/u([1-9][0-9]*)[a-z]*$/);
-          if(!m) return 0;
-          return +m[1]
-    })();
-
-    $f.page_num = (function() {
-          var p= location.pathname;
-          var m = p.match(/^\/[tf][1-9][0-9]*(p[1-9][0-9]*)-/);
-          if(!m) return 0;
-          return +m[1]
-    })();
-
-    /**
-     * $f.charset - charset of current page
+     * $f.lang - user interface language
      *
-     * Return: forum charset (e.g., UTF-8, windows-1252, ISO-8859-1)
+     * Return: langage code (fr for french, en for english, ...)
      */
-    $f.charset= (document.charset?document.charset:document.characterSet).toUpperCase();
+  $f.lang = _ud["lang"];
 
     /**
-     * Donnée de la toolbar.
-     * @param {String} key - Clé du tableau de donnée de l'utilisateur avec la toolbar activée.<br>
-     * Les valeurs possibles sont :
-     * <ul><li>session_logged_in : 1 si connecté, 0 sinon</li><li>username : pseudo</li><li>user_id : identifiant</li>
-     * <li>user_level : niveau ( 0=invité ou membre, 1=administrateur, 2=modérateur )</li>
-     * <li>user_lang : code de langue de l'interface ( exemples : fr=Français, en=Anglais, ... )</li>
-     * <li>activate_toolbar : 1 si toolbar activée, 0 sinon</li><li>fix_toolbar : 1 si toolbar fixée, 0 sinon</li>
-     * <li>notifications : 1 si notification activée, 0 sinon</li><li>avatar : code html de l'affichage de l'avatar</li>
-     * <li>user_posts : nombre de message</li><li>user_nb_privmsg : nombre de message privé</li><li>point_reputation : point de réputation</li></ul>
-     * @returns {Number|String|null} Valeur associée à la clé demandée, ou null si elle n'est pas dans le tableau ou si la toolbar est désactivée.
+     * $f.avatar - user avatar
+     *
+     * Return: langage code (fr for french, en for english, ...)
      */
-    var _ud = (typeof _userdata !== "undefined") ? _userdata : {};
+  $f.avatar = _ud["avatar"];
 
     /**
-     * Identifiant de l'utilisateur.
-     * @returns {Number} 0 si l'utilisateur est déconnecté, son identifiant autrement.
+     * $f.num_posts - user number of post
      */
-    $f.user_id = function(){
-      if(_ud["user_id"]!==null)
-        return _ud["user_id"]
-      return parseInt((my_getcookie('fa_'+location.hostname.replace(/\./g,'_')+'_data')||"0").replace(/.*s:6:"userid";(i:([0-9]+)|s:[0-9]+:"([0-9]+)");.*/,'$2$3'))
-    };
+  $f.num_posts = _ud["user_posts"];
 
     /**
-     * sid de l'utilisateur
-     * @returns {String} Le sid de l'utilisateur, une chaîne vide si il est déconnecté.
+     * $f.num_pms - user number of private message
      */
-    $f.user_sid = function(){
-          return my_getcookie('fa_'+location.hostname.replace(/\./g,'_')+'_sid')||""
-    };
+  $f.num_pms = _ud["user_nb_privmsg"];
+
+  /* $f.num_reps - user number point of reputation */
+  $f.num_reps = _ud["point_reputation"];
 
     /**
-     * tid de l'utilisateur
-     * @returns {String} Le tid de l'utilisateur si disponible, une chaîne vide sinon.
+     * $f.send_pm - send a private message
+     *
+     * @username: array with recipients usernames
+     * @subject: subject
+     * @message: message content
+     * @callback: function called with sended form page as parameter
      */
-    $f.user_tid=  function(){
-          return tid=$("input[name=tid]:first").val() ||  ($("a[href*='&tid=']:first").attr("href")||"").replace(/^.*&tid=([a-z0-9]*)?.*$/,"$1");
-    };
+  $f.send_pm = function(usernames, subject, message, callback) {
+    $.post("/privmsg", _param({"username":username, subject:subject, message:message, mode:"post", post:1}), e);
+  };
 
     /**
-     * Nom de l'utilisateur.
-     * @returns {String} Le pseudo de l'utilisateur si disponible, une chaîne vide sinon.
+     * $f.get_post_data - get data fields of a message
+     * 
+     * @post_id: message id
+     * @callback: function called with data fields as parameters
      */
-    $f.user_name = function(){
-      if(_ud["username"]!==null)
-        return _ud["username"]
-      return ($('#i_icon_mini_logout').attr('title')||"").replace(/^.*? \[ (.*) \]$/,'$1')
-    };
-
-    $f.user_is_guest = (_ud["session_logged_in"]!==null ? !_ud["session_logged_in"] : $("#logout").length!=1);
+  $f.get_post_data = function(post_id, callback) {
+    callback && $.get("/post?p=" + post_id + "&mode=editpost", function(p) {
+      callback($('form[name="post"]', p).serializeArray());
+    });
+  };
 
     /**
-     * Statut d'administrateur de l'utilisateur.
-     * @returns {Number} 1 si administrateur, 0 sinon.
+     * $f.modify_post - modify a message
+     *
+     * @post_id: id of message
+     * @modifier: function which receive each data field and can modify them for a new value (or undefined to remove field)
      */
-    $f.user_is_admin = (_ud["user_level"]!==null ? _ud["user_level"]==1 : $("a[href='/admin/index.forum?part=admin&tid="+$f.user_tid()+"']").length==1);
+  $f.modify_post = function(post_id, modifier) {
+    $f.post.get_form(post_id, function(f) {
+      $.post("/post", _param(f, modifier) + "&post=1");
+    });
+  };
 
     /**
-     * Statut de modérateur de l'utilisateur.
-     * @returns {Number} 1 si moderateur ou administrateur, 0 sinon.
+     * $f.delete_post - delete a message
+     *
+     * @post_id: id of message
+     * @callback: function called with sended form page as parameter
      */
-    $f.user_is_mod = (_ud["user_level"]!==null ? _ud["user_level"] > 0 : $("a[href^='/modcp']:first").length==1);
+  $f.delete_post = function(post_id, callback) {
+    $.post("/post", {p:post_id, mode:"delete", confirm:""}, callback);
+  };
 
     /**
-     * Envoi d'un message privé.
-     * @param {Array} usernames - noms d'utilisateur à qui envoyer le message privé.
-     * @param {String} subject - sujet du message privé.
-     * @param {String} message - contenu du message privé.
-     * @param {Function} callback - fonction appelée une fois le message envoyé avec le contenu de la page de résultat en paramètre.
-     * @returns {undefinded}
+     * $f.reply_topic - post a new reply to a topic
+     *
+     * @topic_id: topic id
+     * @message: message content
+     * @callback: function called with sended form page as parameter
      */
-    $f.send_pm = function(usernames, subject, message, callback){
-      $.post("/privmsg",_param({"username":username, subject: subject, message: message, mode: "post",post:1}), e);
-    };
+  $f.reply_topic = function(topic_id, message, callback) {
+    $.post("/post", {subject:"", message:message, mode:"reply", t:topic_id, post:1, notify:0}, callback);
+  };
 
     /**
-     * Récupérer les champs du formulaire d'édition d'un message.
-     * @param {Number} post_id - identifiant du message.
-     * @param {Function} callback - fonction qui sera appelée avec en paramètres un objet contenant les champs du formulaire.
-     * @returns {undefinded}
+     * $f.split_topic - split a topic
+     *
+     * @new_title: title of new topic
+     * @new_forum_id: forum id of new topic
+     * @posts_id: array with post to place in new topic
+     * @old_topic_id: id of topic in which messages are currently
+     * @callback: function called with sended form page as parameter
      */
-    $f.get_post_data = function(post_id, callback) {
-      callback && $.get('/post?p='+post_id+'&mode=editpost',function(p){ callback($('form[name="post"]', p).serializeArray()) })
-    };
+  $f.split_topic = function(new_title, new_forum_id, posts_id, old_topic_id, callback) {
+    if (typeof p != "object") {
+      p = [p];
+    }
+    $.post("/modcp?tid=" + $f.tid, {subject:new_title, new_forum_id:"f" + new_forum_id, split_type_all:1, post_id_list:posts_id, t:old_topic_id, mode:"split"}, callback);
+  };
 
-    /**
-     * Modifier un message.
-     * @param {Number} post_id - identifiant du message.
-     * @param {Function} modifier - fonction qui aura en paramètre chaque "nom" et "valeur" de champ, et qui retournera la nouvelle valeur du champ ( ou undefined si le champ doit être supprimé ).
-     * @returns {undefinded}
-     */
-    $f.modify_post = function(post_id, modifier) {
-      $f.post.get_form(post_id, function(f) { $.post("/post", _param(f, modifier)+"&post=1"); });
-    };
-
-    /**
-     * Supprimer un message.
-     * @param {Number} post_id - identifiant du message.
-     * @param {Function} callback - fonction qui sera appelée avec en paramètre la page de résultat de la suppression.
-     * @returns {undefinded}
-     */
-    $f.delete_post = function(post_id, callback) {
-      $.post("/post",{p:post_id, mode:"delete", confirm:""}, callback);
-    };
-
-    /**
-     * Poster une réponse à un sujet.
-     * @param {Number} topic_id - identifiant du sujet.
-     * @param {String} message - contenu du message.
-     * @param {Function} callback - fonction qui sera appelée avec en paramètre la page de résultat d'envoi.
-     * @returns {undefinded}
-     */
-    $f.reply_topic= function(topic_id, message, callback) {
-      $.post("/post",{subject:"",message:message,mode:"reply",t:topic_id,post:1,notify:0},callback);
-    };
-
-    /**
-     * Diviser des messages dans un nouveau sujet.
-     * @param {String} title - titre du nouveau sujet.
-     * @param {Number} forum_id - identifiant du forum dans lequel le sujet sera créé.
-     * @param {Array} posts_id - tableau avec la liste des identiants de message.
-     * @param {Number} old_topic_id - identifiant du sujet dans lesquels les messages se trouvent.
-     * @param {Function} callback - fonction qui sera appelée avec en paramètre la page de résultat de division.
-     * @returns {undefinded}
-     */
-    $f.split_topic =  function(new_title, new_forum_id, posts_id, old_topic_id, callback){
-      if(typeof p!="object") p=[p];
-      $.post("/modcp?tid="+$f.user_tid(),{subject:new_title, new_forum_id:"f"+new_forum_id, split_type_all:1, post_id_list:posts_id, t:old_topic_id, mode:"split"}, callback);
-    };
-
+    /* TODO combine split all and split beyond */
     /**
      * Diviser les messages à la suite d'un message donné dans un nouveau sujet.
      * @param {String} title - titre du nouveau sujet.
@@ -230,22 +262,43 @@ var $f = $f || {};
      * @param {Function} callback - fonction qui sera appelée avec en paramètre la page de résultat de division.
      * @returns {undefinded}
      */
-    $f.split_topic_beyond= function(title, forum_id, posts_id, old_topic_id, callback){
-      if(typeof p!="object") p=[p];
-      $.post("/modcp?tid="+$f.user_tid(),{subject:title,new_forum_id: "f"+forum_id, split_type_beyond:1, post_id_list: posts_id,t: old_topic_id, mode:"split"}, callback);
-    };
+  $f.split_topic_beyond = function(title, forum_id, posts_id, old_topic_id, callback) {
+    if (typeof p != "object") {
+      p = [p];
+    }
+    $.post("/modcp?tid=" + $f.tid, {subject:title, new_forum_id:"f" + forum_id, split_type_beyond:1, post_id_list:posts_id, t:old_topic_id, mode:"split"}, callback);
+  };
 
-    $f.delete_topic =  function(t,e) {
-      $.post("/modcp?tid="+$f.user_tid(),{ t:t, mode:"delete",confirm:1},e);
-    };
+    /**
+     * $f.delete_topic - detete a topic
+     *
+     * @topic_id: id of topic
+     * @callback: function called with sended form page as parameter
+     */
+  $f.delete_topic = function(topic_id, callback) {
+    $.post("/modcp?tid=" + $f.tid, {t:topic_id, mode:"delete", confirm:1}, callback);
+  };
 
-    $f.trash_topic = function(t,e) {
-      $.get("/modcp?mode=trash&t="+t+"&tid="+$f.user_tid(),e)
-    };
+    /**
+     * $f.trash_topic - move a topic to trash
+     *
+     * @topic_id: id of topic
+     * @callback: function called with sended form page as parameter
+     */
+  $f.trash_topic = function(topic_id, callback) {
+    $.get("/modcp?mode=trash&t=" + topic_id + "&tid=" + $f.tid, callback);
+  };
 
-    $f.move_topic = function(t,f,e) {
-      $.post("/modcp?tid="+$f.user_tid(),{tid:$f.user_tid(),newforum:"f"+f,mode:"move",t:t,confirm:1},e);
-    };
-    
-    
+  /* TODO combine move and trash */
+  /**
+   * $f.move_topic - move a topic to another forum
+   *
+   * @topic_id: id of topic
+   * @forum_id: destination forum id
+   * @callback: function called with sended form page as parameter
+   */
+  $f.move_topic = function(topic_id, forum_id, callback) {
+    $.post("/modcp?tid=" + $f.tid, {tid:$f.tid, newforum:"f" + forum_id, mode:"move", t:topic_id, confirm:1}, callback);
+  };
 })();
+
