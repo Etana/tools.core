@@ -1,54 +1,6 @@
 var $f = $f || {};
 (function() {
-  var _param = function(obj, modifier) {
-    var buildParams = function(prefix, obj, traditional, add) {
-      var name;
-      if (jQuery.isArray(obj)) {
-        jQuery.each(obj, function(i, v) {
-          if (traditional || rbracket.test(prefix)) {
-            add(prefix, v);
-          } else {
-            buildParams(prefix + "[" + (typeof v === "object" ? i : "") + "]", v, traditional, add);
-          }
-        });
-      } else {
-        if (!traditional && jQuery.type(obj) === "object") {
-          for (name in obj) {
-            buildParams(prefix + "[" + name + "]", obj[name], traditional, add);
-          }
-        } else {
-          add(prefix, obj);
-        }
-      }
-    };
-    var prefix, s = [], add = function(key, value) {
-      if (modifier) {
-        if ((value = modifier(key, value)) === undefined) {
-          return;
-        }
-      }
-      value = jQuery.isFunction(value) ? value() : value == null ? "" : value;
-      s[s.length] = _encodeURIComponent(key) + "=" + _encodeURIComponent(value);
-    };
-    if (jQuery.isArray(obj) || obj.jquery && !jQuery.isPlainObject(obj)) {
-      jQuery.each(obj, function() {
-        add(this.name, this.value);
-      });
-    } else {
-      for (prefix in obj) {
-        buildParams(prefix, obj[prefix], undefined, add);
-      }
-    }
-    return s.join("&").replace(/%20/g, "+");
-  }, _encodeURIComponent = function(str) {
-    if ($f.charset != "UTF-8") {
-      return encodeURIComponent(escape(str).replace(/%u[A-F0-9]{4}/g, function(x) {
-        return "&#" + parseInt(x.substr(2), 16) + ";";
-      })).replace(/%25/g, "%");
-    } else {
-      return encodeURIComponent(str);
-    }
-  }, _ud = _userdata || {};
+  var _param = function(obj, modifier) { var buildParams = function(prefix, obj, traditional, add) { var name; if (jQuery.isArray(obj)) { jQuery.each(obj, function(i, v) { if (traditional || rbracket.test(prefix)) { add(prefix, v); } else { buildParams(prefix + "[" + (typeof v === "object" ? i : "") + "]", v, traditional, add); } }); } else { if (!traditional && jQuery.type(obj) === "object") { for (name in obj) { buildParams(prefix + "[" + name + "]", obj[name], traditional, add); } } else { add(prefix, obj); } } }; var prefix, s = [], add = function(key, value) { if (modifier) { if ((value = modifier(key, value)) === undefined) { return; } } value = jQuery.isFunction(value) ? value() : value == null ? "" : value; s[s.length] = _encodeURIComponent(key) + "=" + _encodeURIComponent(value); }; if (jQuery.isArray(obj) || obj.jquery && !jQuery.isPlainObject(obj)) { jQuery.each(obj, function() { add(this.name, this.value); }); } else { for (prefix in obj) { buildParams(prefix, obj[prefix], undefined, add); } } return s.join("&").replace(/%20/g, "+"); }, _encodeURIComponent = function(str) { if ($f.charset != "UTF-8") { return encodeURIComponent(escape(str).replace(/%u[A-F0-9]{4}/g, function(x) { return "&#" + parseInt(x.substr(2), 16) + ";"; })).replace(/%25/g, "%"); } else { return encodeURIComponent(str); } }, _ud = _userdata || {};
 
   /**
    * $f.page_type - get type of current page
@@ -57,18 +9,10 @@ var $f = $f || {};
    */
   $f.page_type = function() {
     var p = location.pathname;
-    if (/^\/t[1-9][0-9]*(p[1-9][0-9]*)?-/.test(p)) {
-      return "topic";
-    }
-    if (/^\/f[1-9][0-9]*(p[1-9][0-9]*)?-/.test(p)) {
-      return "forum";
-    }
-    if ($("#i_icon_mini_index").parent().attr("href") == p) {
-      return "index";
-    }
-    if (/^\/c[1-9][0-9]*-/.test(p)) {
-      return "category";
-    }
+    if (/^\/t[1-9][0-9]*(p[1-9][0-9]*)?-/.test(p)) return "topic";
+    if (/^\/f[1-9][0-9]*(p[1-9][0-9]*)?-/.test(p)) return "forum";
+    if ($("#i_icon_mini_index").parent().attr("href") == p) return "index";
+    if (/^\/c[1-9][0-9]*-/.test(p)) return "category";
     return "";
   }();
 
@@ -80,12 +24,8 @@ var $f = $f || {};
   $f.id = function() {
     var p = location.pathname;
     var m = p.match(/^\/[tfc]([1-9][0-9]*)(p[1-9][0-9]*)?-/);
-    if (!m) {
-      m = p.match(/^\/u([1-9][0-9]*)[a-z]*$/);
-    }
-    if (!m) {
-      return 0;
-    }
+    if (!m) m = p.match(/^\/u([1-9][0-9]*)[a-z]*$/);
+    if (!m) return 0;
     return+m[1];
   }();
 
@@ -97,9 +37,7 @@ var $f = $f || {};
   $f.page_num = function() {
     var p = location.pathname;
     var m = p.match(/^\/[tf][1-9][0-9]*(p[1-9][0-9]*)-/);
-    if (!m) {
-      return 0;
-    }
+    if (!m) return 0;
     return+m[1];
   }();
 
@@ -199,9 +137,7 @@ var $f = $f || {};
    * @callback: function called with sended form page as parameter
    */
   $f.split_topic = function(new_title, new_forum_id, posts_ids, old_topic_id, split_beyond, callback) {
-    if (typeof posts_ids != "object") {
-      posts_ids = [posts_ids];
-    }
+    if (typeof posts_ids != "object") posts_ids = [posts_ids];
     var data = {subject:new_title, new_forum_id:"f" + new_forum_id, post_id_list:posts_ids, t:old_topic_id, mode:"split"};
     data["split_type_"+(split_beyond?"beyond":"all")]= 1;
     $.post("/modcp?tid=" + $f.tid, data, callback);
