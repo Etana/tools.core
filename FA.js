@@ -99,7 +99,7 @@ var $f = $f || {};
    * @modifier: function which receive each data field and can modify them for a new value (or undefined to remove field)
    */
   $f.modify_post = function(post_id, modifier) {
-    $f.post.get_form(post_id, function(f) {
+    $f.get_post_data(post_id, function(f) {
       $.post("/post", _param(f, modifier) + "&post=1");
     });
   };
