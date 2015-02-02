@@ -76,9 +76,16 @@ $(function($){
         var to_post = _args_to_modifier(arguments, required);
         for(var i=0; i<required.length; i++)
           if(!(required[i] in to_post)) return;
+        var def = $.Deferred();
         $.each(this._d, function(_,v){
-          $.post("/post", _param($.extend({'notify':0}, to_post, {'post':1,'mode':'reply', t:v})));
-        })
+          $.post("/post", _param($.extend({'notify':0}, to_post, {'post':1,'mode':'reply', t:v})), function(c){ 
+            //x.indexOf('<a href="/viewtopic?t=')
+            // <a href="/viewtopic?t=1&amp;topic_name#20">Cliquez ici pour voir votre message</a><br /><br /><a href="/f4-yeah">Cliquez ici pour retourner au forum</a>
+            if($('h1', c).next().find('a[href^="/viewtopic?"]').attr('href')) def.resolve(c);
+            else def.reject(c);
+          });
+        });
+        return def;
       },
       /** $topic(topic_id).remove() - detete a topic */
       remove: function(callback) {
@@ -172,11 +179,11 @@ $(function($){
   window["$chat"] = window["$chat"] || {};
 
   $chat.post = function(message){
-    var required = ['sent'];
+    var required = ['message'];
     var to_post = _args_to_modifier(arguments, required);
     for(var i=0; i<required.length; i++)
       if(!(required[i] in to_post)) return;
-    $.post("/chatbox/chatbox_actions.forum?archives", $.extend(to_post, {mode:"send"}));
+    $.post("/chatbox/actions.forum", $.extend(to_post, {method:"send", archive:0}));
   };
 
   $.each(m, function(k,v){ window[k] = function() { var args = $.makeArray(arguments); if(args.length==1 && $.isArray(args[0])) args = args[0]; return $.extend(window[k]||{}, v, {_d:args,_t:k}) }; });
