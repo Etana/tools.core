@@ -52,7 +52,7 @@ $(function($){
         for(var i=0; i<required.length; i++)
           if(!(required[i] in to_post)) return;
         $.each(this._d, function(_,v){
-          $.post("/post", $.extend({'notify':0}, to_post, {'post':1,'mode':'newtopic', f:v}));
+          $.post("/post", _param($.extend({'notify':0}, to_post, {'post':1,'mode':'newtopic', f:v})));
         })
       },
       /** $forum(forum_id).change(name, desc) - edit forum configuration */
@@ -77,7 +77,7 @@ $(function($){
         for(var i=0; i<required.length; i++)
           if(!(required[i] in to_post)) return;
         $.each(this._d, function(_,v){
-          $.post("/post", $.extend({'notify':0}, to_post, {'post':1,'mode':'reply', t:v}));
+          $.post("/post", _param($.extend({'notify':0}, to_post, {'post':1,'mode':'reply', t:v})));
         })
       },
       /** $topic(topic_id).remove() - detete a topic */
@@ -123,7 +123,7 @@ $(function($){
         if (!$.isArray(posts_ids)) posts_ids = [posts_ids];
         var data = {subject:new_title, new_forum_id:"f" + new_forum_id, post_id_list:posts_ids, t:this._d[0], mode:"split"};
         data["split_type_"+(split_beyond?"beyond":"all")]= 1;
-        $.post("/modcp?tid=" + $user.tid, data);
+        $.post("/modcp?tid=" + $user.tid, _param(data));
       }
     },
     $post: {
@@ -152,14 +152,14 @@ $(function($){
         var to_post = _args_to_modifier(arguments, required);
         for(var i=0; i<required.length; i++)
           if(!(required[i] in to_post)) return;
-        $.post("/privmsg", $.extend(to_post, {"username":this._d, mode:"post", post:1}));
+        $.post("/privmsg", _param($.extend(to_post, {"username":this._d, mode:"post", post:1})));
       },
       /** $user(user_id).ban(num_days, reason) - ban a user */
       ban : function() {
         // nombre de jour et raison
         var to_post = _args_to_modifier(arguments, ['ban_user_date', 'ban_user_reason']);
         $.each(this._d, function(_,v){
-          $.post('/modcp?tid='+$user.tid, {tid:$user.tid,confirm:1,mode:'ban', user_id:9})
+          $.post('/modcp?tid='+$user.tid, _param($.extend(to_post, {tid:$user.tid,confirm:1,mode:'ban', user_id:9})))
         })
       },
       /** $user(user_id).unban() - unban a user */
@@ -167,6 +167,16 @@ $(function($){
         $.post('/admin/index.forum?part=users_groups&sub=users&mode=ban_control&extended_admin=1&tid='+$user.tid, {users_to_unban:this._d, unban_users:1})
       }
     }
+  };
+  
+  window["$chat"] = window["$chat"] || {};
+
+  $chat.post = function(message){
+    var required = ['sent'];
+    var to_post = _args_to_modifier(arguments, required);
+    for(var i=0; i<required.length; i++)
+      if(!(required[i] in to_post)) return;
+    $.post("/chatbox/chatbox_actions.forum?archives", $.extend(to_post, {mode:"send"}));
   };
 
   $.each(m, function(k,v){ window[k] = function() { var args = $.makeArray(arguments); if(args.length==1 && $.isArray(args[0])) args = args[0]; return $.extend(window[k]||{}, v, {_d:args,_t:k}) }; });
