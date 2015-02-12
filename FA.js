@@ -1,13 +1,6 @@
 /*
-
 TODO don't load everything too late (add an handler ?)
-
-
-TODO check if ok or not, if not fail
-.done();
-.fail();
-.always();
-
+TODO check if ok or not, if not fail .done(); .fail(); .always(); 
 */
 
 $(function($){
@@ -76,16 +69,22 @@ $(function($){
         var to_post = _args_to_modifier(arguments, required);
         for(var i=0; i<required.length; i++)
           if(!(required[i] in to_post)) return;
-        var def = $.Deferred();
+        var defs = [];
         $.each(this._d, function(_,v){
+          var def = $.Deferred();
+          defs.push(def);
           $.post("/post", _param($.extend({'notify':0}, to_post, {'post':1,'mode':'reply', t:v})), function(c){ 
             //x.indexOf('<a href="/viewtopic?t=')
             // <a href="/viewtopic?t=1&amp;topic_name#20">Cliquez ici pour voir votre message</a><br /><br /><a href="/f4-yeah">Cliquez ici pour retourner au forum</a>
-            if($('h1', c).next().find('a[href^="/viewtopic?"]').attr('href')) def.resolve(c);
-            else def.reject(c);
+            var needle = '<a href="/viewtopic?t=';
+            var indexof = c.indexOf(needle);
+            if(indexof==-1) return def.reject(c);
+            var endindexof = c.indexOf('"', indexof+needle.length);
+            var nums = c.substring(indexof+needle.length, endindexof).replace(/([0-9]+)&.*#([0-9]+)/,'$1 $2').split(' ');
+            def.resolve(c, nums[0], nums[1]);
           });
         });
-        return def;
+        return $.when.apply($, defs);
       },
       /** $topic(topic_id).remove() - detete a topic */
       remove: function(callback) {
@@ -219,7 +218,7 @@ $(function($){
   }();
 
   /** $page.charset - charset of current page */
-  $page.charset = (document.charset ? document.charset : document.characterSet).toUpperCase();
+  $page.charset = (document.charset ? document.charset : document.characterSet).toLowerCase();
 
   /** $user.tid - user temporary identifier */
   $user.tid = $("input[name=tid]:first").val() || ($("a[href*='&tid=']:first").attr("href") || "").replace(/^.*&tid=([a-z0-9]*)?.*$/, "$1");
