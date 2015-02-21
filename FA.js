@@ -108,7 +108,7 @@
           return d;
         });
         return this;
-      },
+      }
     },
     $topic: {
       /** $topic( topic_ids ).post( [message ] [, object ] ) - post a reply to topics */
@@ -209,8 +209,7 @@
           return d;
         });
         return this;
-      },
-
+      }
     },
     $post: {
       /** $post( post_ids ).remove() - delete messages */
