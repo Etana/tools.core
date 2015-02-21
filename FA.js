@@ -68,9 +68,27 @@
     }
   };
 
+  var _get_forum_id = function(topic_id, forum_id) {
+    var dd = $.Deferred();
+    if(forum_id)
+      dd.resolve(forum_id); 
+    else
+      $.get('/modcp?mode=move&t='+topic_id+'&tid='+$user.tid, function(c){ dd.resolve(parseInt($('form[method="post"] [name="f"]', c).val())) });
+    return dd;
+  }
+        
+  var _get_topic_id = function(post_id, topic_id) {
+    var dd = $.Deferred();
+    if(topic_id)
+      dd.resolve(topic_id); 
+    else
+      $.get('/post?p='+post_id+'&mode=quote', function(c){ dd.resolve(parseInt($('form[method="post"] [name="t"]', c).val())) });
+    return dd;
+  }
+
   var m = {
     $forum: {
-      /** $forum(forum_id).post(subject, message) - post a new topic */
+      /** $forum( forum_ids ).post( [subject [, message ]] [, object ] ) - post new topics */
       post: function() {
         var required = ['subject', 'message'];
         var to_post = _args_to_modifier(arguments, required);
@@ -93,7 +111,7 @@
       },
     },
     $topic: {
-      /** $topic(topic_id).post(message) - post a reply to a topic */
+      /** $topic( topic_ids ).post( [message ] [, object ] ) - post a reply to topics */
       post: function() {
         var required = ['message'];
         var to_post = _args_to_modifier(arguments, required);
@@ -114,7 +132,7 @@
         });
         return this;
       },
-      /** $topic(topic_id).remove() - detete a topic */
+      /** $topic( topic_ids ).remove() - detete topics */
       remove: function() {
         this._p = $.map(this._d, function(v) {
           var d = $.Deferred();
@@ -129,7 +147,7 @@
         });
         return this;
       },
-      /** $topic(topic_id).move(forum_id) - move a topic to a forum */
+      /** $topic( topic_ids ).move( forum_id ) - move topics to a forum */
       move: function(forum_id) {
         this._p = $.map(this._d, function(v) {
           var d = $.Deferred();
@@ -145,7 +163,7 @@
         });
         return this;
       },
-      /** $topic(topic_id).trash(forum_id) - move a topic to the trash forum */
+      /** $topic( topic_ids ).trash() - move topics to the trash forum */
       trash: function() {
         this._p = $.map(this._d, function(v) {
           var d = $.Deferred();
@@ -154,24 +172,27 @@
         });
         return this;
       },
-      /** $topic(topic_id).merge(forum_id) - merge a topic onto another one */
+      /** $topic( topic_ids ).merge( [forum_id ] ) - merge topics into one */
       merge: function(forum_id) {
         var topic_id = this._d.slice(-1)[0];
+        var dd = _get_forum_id(topic_id, forum_id); 
         this._p = $.map(this._d.slice(0,-1), function(v) {
           var d = $.Deferred();
-          $.post("/merge", {
-            tid: $user.tid,
-            from_topic: v,
-            to_topic: topic_id,
-            submit: 1,
-            f: forum_id || $page.id,
-            confirm: 1
-          }, function(c){ _bridge_post_deferred(c, d) });
+          dd.done(function(fid){  
+            $.post("/merge", {
+              tid: $user.tid,
+              from_topic: v,
+              to_topic: topic_id,
+              submit: 1,
+              f: fid,
+              confirm: 1
+            }, function(c){ _bridge_post_deferred(c, d) });
+          });
           return d;
         });
         return this;
       },
-      /** $topic(topic_id).lock() - lock a topic */
+      /** $topic( topic_ids ).lock() - lock topics */
       lock: function() {
         this._p = $.map(this._d, function(v) {
           var d = $.Deferred();
@@ -180,7 +201,7 @@
         });
         return this;
       },
-      /** $topic(topic_id).unlock() - unlock a topic */
+      /** $topic( topic_ids ).unlock() - unlock topics */
       unlock: function() {
         this._p = $.map(this._d, function(v) {
           var d = $.Deferred();
@@ -190,25 +211,9 @@
         return this;
       },
 
-      /** $topic(topic_id).split(new_title, new_forum_id, posts_ids, split_beyond) - split a topic */
-      split: function(new_title, new_forum_id, posts_ids, split_beyond) {
-        if (!$.isArray(posts_ids)) posts_ids = [posts_ids];
-        var data = {
-          subject: new_title,
-          new_forum_id: "f" + new_forum_id,
-          post_id_list: posts_ids,
-          t: this._d[0],
-          mode: "split"
-        };
-        data["split_type_" + (split_beyond ? "beyond" : "all")] = 1;
-        var d = $.Deferred();
-        $.post("/modcp?tid=" + $user.tid, _param(data), function(c){ _bridge_post_deferred(c, d) });
-        this._p = [d];
-        return this;
-      }
     },
     $post: {
-      /** $post(post_id).remove() - delete a message */
+      /** $post( post_ids ).remove() - delete messages */
       remove: function() {
         this._p = $.map(this._d, function(v) {
           var d = $.Deferred();
@@ -221,7 +226,7 @@
         });
         return this;
       },
-      /** $post(post_id).change(message) - modify a message */
+      /** $post( post_ids ).change( [message ] [, object ] ) - modify messages */
       change: function() {
         var to_modify = _args_to_modifier(arguments, ['message']);
         this._p = $.map(this._d, function(v) {
@@ -237,10 +242,36 @@
           return d;
         })
         return this;
+      },
+      /** $post( post_ids ).split( new_title [, new_forum_id [, topic_id [, beyond ]]] ) - split posts into a new topic */
+      split: function(new_title, new_forum_id, topic_id, beyond) {
+        if(!this._d) return this;
+        var d = $.Deferred();
+        var post_list = this._d;
+        _get_topic_id(this._d[0], topic_id).done(function(topic_id) {
+          _get_forum_id(topic_id, new_forum_id).done(function(new_forum_id){ 
+            var data = {
+              subject: new_title,
+              new_forum_id: "f" + new_forum_id,
+              post_id_list: post_list,
+              t: topic_id,
+              mode: "split"
+            };
+            data["split_type_" + (beyond ? "beyond" : "all")] = 1;
+            var d = $.Deferred();
+            $.post("/modcp?tid=" + $user.tid, _param(data), function(c){ _bridge_post_deferred(c, d) });
+          });
+        });
+        this._p = [d];
+        return this;
+      },
+      /** $post( post_ids ).split_beyond( new_title [, new_forum_id [, topic_id ]] ) - split posts beyond givens one into a new topic */
+      split_beyond: function(new_title, new_forum_id, topic_id) {
+        return this.split(new_title, new_forum_id, topic_id, true);
       }
     },
     $user: {
-      /** $user(username).pm(subject, message) - send a private message */
+      /** $user( usernames ).pm( [subject [, message ]] [, object ] ) - send private messages */
       pm: function() {
         var required = ['subject', 'message'];
         var to_post = _args_to_modifier(arguments, required);
@@ -251,7 +282,7 @@
         this._p = [d];
         return this;
       },
-      /** $user(user_id).ban(num_days, reason) - ban a user */
+      /** $user( user_ids ).ban( [num_days [, reason ]] [, object ] ) - ban users */
       ban: function() {
         // nombre de jour et raison
         var to_post = _args_to_modifier(arguments, ['ban_user_date', 'ban_user_reason']);
@@ -267,7 +298,7 @@
         });
         return this;
       },
-      /** $user(user_id).unban() - unban a user */
+      /** $user( user_ids ).unban() - unban users */
       unban: function() {
         var d = $.Deferred();
         $.post('/admin/index.forum?part=users_groups&sub=users&mode=ban_control&extended_admin=1&tid=' + $user.tid, {
@@ -282,7 +313,8 @@
 
   window["$chat"] = window["$chat"] || {};
 
-  $chat.post = function(message) {
+  /** $chat.post( [message ] [, object ] ) - unban users */
+  $chat.post = function() {
     var required = ['message'];
     var to_post = _args_to_modifier(arguments, required);
     for (var i = 0; i < required.length; i++)
