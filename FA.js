@@ -357,12 +357,13 @@
   $user.tid = get_tid(); 
   $(function(){ $user.tid = get_tid(); });
 
+  $user.id = parseInt(((my_getcookie('fa_'+location.host.replace(/\./g,'_')+'_data')||'').match(/"userid";(?:s:[0-9]+:"|i:)([0-9]+)/)||[0,-1])[1]); // id of user 
+  $user.guest = ($user.id == -1); // is user a guest?
+
   var update_user_data = function(){
     var _ud = _userdata || {};
 
-    $user.id = _ud["user_id"]; // id of user
     $user.name = _ud["username"]; // user username (or Anonymous)
-    $user.guest = !_ud["session_logged_in"]; // is user a guest?
     $user.admin = _ud["user_level"] == 1; // is user an admin?
     $user.mod = _ud["user_level"] > 0; // is user a moderator?
     $user.lang = _ud["lang"]; // user langage (fr for french, ...)
@@ -370,6 +371,7 @@
     $user.num_post = _ud["user_posts"]; // user number of post
     $user.num_pm = _ud["user_nb_privmsg"]; // user number of private message
     $user.num_reputation = _ud["point_reputation"]; // user number of rep points
+    $user.rank = window["_lang"] ? _lang["rank_title"] : ""; // rank of the user
   };
   update_user_data();
   $(update_user_data);
