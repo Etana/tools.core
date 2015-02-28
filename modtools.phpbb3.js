@@ -1,16 +1,13 @@
-$.ajax({url:'http://js01.fra.co/32000.js',cache:!0,dataType:'script'}).done(function(){
+$.ajax({url:'http://localhost/FA.js',cache:!0,dataType:'script'}).done(function(){
 
 var selected;
 
 // if viewing a topic
-switch($page.type) {
+switch($fa.pagetype) {
 case "topic":
   // move post to given forum instead of deleting it
   $('img.i_icon_delete').parent().click(function(){
-    var topic_link = location.pathname.replace(/^(\/t[0-9]+)p[0-9]+/,'$1');
-    var post_id = $(this).attr('href').match(/p=(\d+)&/)[1];
-    $post(post_id).split('[coupure '+$user.login+'] '+topic_link, 1).done(function(ret){
-      console.log(ret);
+    $post($fa.post(this)).split('[coupure '+$fa.username+'] '+location.pathname, 1).done(function(ret){
       $(this).closest('.post').remove()
     }.bind(this));
     return false
@@ -22,8 +19,7 @@ case "forum":
     $(this).toggleClass('item-selected');
     if(!selected) selected = $topic();
     $('a.topictitle', this).each(function(){
-      selected.toggle(parseInt($(this).attr('href').match(/^\/t([0-9]+)/)[1]));
-      console.log(selected._d)
+      selected.toggle($fa.thread(this));
     })
   });
   break;

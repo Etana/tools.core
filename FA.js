@@ -1,8 +1,8 @@
 (function($) {
-  var _param = function(obj, modifier) { var buildParams = function(prefix, obj, traditional, add) { var name; if (jQuery.isArray(obj)) { jQuery.each(obj, function(i, v) { if (traditional || /\[\]$/.test(prefix)) { add(prefix, v); } else { buildParams(prefix + "[" + (typeof v === "object" ? i : "") + "]", v, traditional, add); } }); } else { if (!traditional && jQuery.type(obj) === "object") { for (name in obj) { buildParams(prefix + "[" + name + "]", obj[name], traditional, add); } } else { add(prefix, obj); } } }; var prefix, s = [], add = function(key, value) { var nvalue; if (modifier) { if ((nvalue = modifier(key, value)) === null) { return; } else if (nvalue !== undefined) value = nvalue } value = jQuery.isFunction(value) ? value() : value == null ? "" : value; s[s.length] = _encodeURIComponent(key) + "=" + _encodeURIComponent(value); }; if (jQuery.isArray(obj) || obj.jquery && !jQuery.isPlainObject(obj)) { jQuery.each(obj, function() { add(this.name, this.value); }); } else { for (prefix in obj) { buildParams(prefix, obj[prefix], undefined, add); } } return s.join("&").replace(/%20/g, "+"); }, _encodeURIComponent = function(str) { if ($page.charset != "utf-8") { return encodeURIComponent(escape(str).replace(/%u[A-F0-9]{4}/g, function(x) { return "&#" + parseInt(x.substr(2), 16) + ";"; })).replace(/%25/g, "%"); } else { return encodeURIComponent(str); } };
+  var _param = function(obj, modifier) { var buildParams = function(prefix, obj, traditional, add) { var name; if (jQuery.isArray(obj)) { jQuery.each(obj, function(i, v) { if (traditional || /\[\]$/.test(prefix)) { add(prefix, v); } else { buildParams(prefix + "[" + (typeof v === "object" ? i : "") + "]", v, traditional, add); } }); } else { if (!traditional && jQuery.type(obj) === "object") { for (name in obj) { buildParams(prefix + "[" + name + "]", obj[name], traditional, add); } } else { add(prefix, obj); } } }; var prefix, s = [], add = function(key, value) { var nvalue; if (modifier) { if ((nvalue = modifier(key, value)) === null) { return; } else if (nvalue !== undefined) value = nvalue } value = jQuery.isFunction(value) ? value() : value == null ? "" : value; s[s.length] = _encodeURIComponent(key) + "=" + _encodeURIComponent(value); }; if (jQuery.isArray(obj) || obj.jquery && !jQuery.isPlainObject(obj)) { jQuery.each(obj, function() { add(this.name, this.value); }); } else { for (prefix in obj) { buildParams(prefix, obj[prefix], undefined, add); } } return s.join("&").replace(/%20/g, "+"); }, _encodeURIComponent = function(str) { if ($fa.charset != "utf-8") { return encodeURIComponent(escape(str).replace(/%u[A-F0-9]{4}/g, function(x) { return "&#" + parseInt(x.substr(2), 16) + ";"; })).replace(/%25/g, "%"); } else { return encodeURIComponent(str); } };
 
   var _get_forum_data = function(forum_id, callback) {
-    if (callback) return $.get("/admin/index.forum?part=general&sub=general&mode=edit&tid=" + u.tid + "&fid=" + forum_id, function(p) {
+    if (callback) return $.get("/admin/index.forum?part=general&sub=general&mode=edit&tid=" + $fa.tid + "&fid=" + forum_id, function(p) {
       callback($('form[name="edit"]', p).serializeArray());
     });
   };
@@ -118,7 +118,7 @@
   $topic.prototype.forum = function(){
     this._p = $.map(this._d, function(v){
       var d = $.Deferred();
-      $.get('/modcp?mode=move&t='+v+'&tid='+u.tid, function(c){
+      $.get('/modcp?mode=move&t='+v+'&tid='+$fa.tid, function(c){
         var forum_id = parseInt($('form[method="post"] [name="f"]', c).val());
         if(forum_id>0) d.resolve(window["$forum"](forum_id));
         else d.reject();
@@ -153,7 +153,7 @@
   $topic.prototype.remove= function() {
     this._p = $.map(this._d, function(v) {
       var d = $.Deferred();
-      $.post("/modcp?tid=" + u.tid, {
+      $.post("/modcp?tid=" + $fa.tid, {
         t: v,
         mode: "delete",
         confirm: 1
@@ -169,8 +169,8 @@
     this._p = $.map(this._d, function(v) {
       var d = $.Deferred();
       console.log(v);
-      $.post("/modcp?tid=" + u.tid, {
-        tid: u.tid,
+      $.post("/modcp?tid=" + $fa.tid, {
+        tid: $fa.tid,
         new_forum: "f" + forum_id,
         mode: "move",
         t: v,
@@ -184,7 +184,7 @@
   $topic.prototype.trash= function() {
     this._p = $.map(this._d, function(v) {
       var d = $.Deferred();
-      $.get("/modcp?mode=trash&t=" + v + "&tid=" + u.tid, function(c){ _bridge_post_deferred(c, d)});
+      $.get("/modcp?mode=trash&t=" + v + "&tid=" + $fa.tid, function(c){ _bridge_post_deferred(c, d)});
       return d;
     });
     return this;
@@ -197,7 +197,7 @@
       var d = $.Deferred();
       dd.done(function(f){  
         $.post("/merge", {
-          tid: u.tid,
+          tid: $fa.tid,
           from_topic: v,
           to_topic: topic_id,
           submit: 1,
@@ -213,7 +213,7 @@
   $topic.prototype.lock= function() {
     this._p = $.map(this._d, function(v) {
       var d = $.Deferred();
-      $.get("/modcp?mode=lock&t=" + v + "&tid=" + u.tid, function(c){ _bridge_post_deferred(c, d) });
+      $.get("/modcp?mode=lock&t=" + v + "&tid=" + $fa.tid, function(c){ _bridge_post_deferred(c, d) });
       return d;
     });
     return this;
@@ -222,7 +222,7 @@
   $topic.prototype.unlock = function() {
     this._p = $.map(this._d, function(v) {
       var d = $.Deferred();
-      $.get("/modcp?mode=unlock&t=" + v + "&tid=" + u.tid, function(c){ _bridge_post_deferred(c, d) });
+      $.get("/modcp?mode=unlock&t=" + v + "&tid=" + $fa.tid, function(c){ _bridge_post_deferred(c, d) });
       return d;
     });
     return this;
@@ -303,7 +303,7 @@
           mode: "split"
         };
         data["split_type_" + (beyond ? "beyond" : "all")] = 1;
-        $.post("/modcp?tid=" + u.tid, _param(data), function(c){ _bridge_post_deferred(c, d) });
+        $.post("/modcp?tid=" + $fa.tid, _param(data), function(c){ _bridge_post_deferred(c, d) });
       });
     });
     this._p = [d];
@@ -333,8 +333,8 @@
     var to_post = _args_to_modifier(arguments, ['ban_user_date', 'ban_user_reason']);
     this._p = $.map(this._d, function(v) {
       var d = $.Deferred();
-      $.post('/modcp?tid=' + u.tid, _param($.extend(to_post, {
-        tid: u.tid,
+      $.post('/modcp?tid=' + $fa.tid, _param($.extend(to_post, {
+        tid: $fa.tid,
         confirm: 1,
         mode: 'ban',
         user_id: v
@@ -346,7 +346,7 @@
   /** $user( user_ids ).unban() - unban users */
   $user.prototype.unban= function() {
     var d = $.Deferred();
-    $.post('/admin/index.forum?part=users_groups&sub=users&mode=ban_control&extended_admin=1&tid=' + u.tid, {
+    $.post('/admin/index.forum?part=users_groups&sub=users&mode=ban_control&extended_admin=1&tid=' + $fa.tid, {
       users_to_unban: this._d,
       unban_users: 1
     }, function(c){ _bridge_post_deferred(c,d)})
@@ -374,6 +374,7 @@
   var arg_to_array = function(arg){
     var args = $.makeArray(arg); 
     if (args.length == 1 && $.isArray(args[0])) args = args[0];
+    if (args.length == 1 && $.type(args[0])=="object" && "_d" in args[0]) args = args[0]._d;
     return args
   };
 
@@ -384,7 +385,7 @@
     v.prototype['add'] = function() {
       var args = arg_to_array(arguments);
       $.merge(this._d, args);
-      this._d = $.grep(this._d, function(v, i){return i==$.inArray(v, this._d)}.bind(this));
+      this._d = $.grep(this._d, function(v, i){return i==$.inArray(v, this._d)&&v}.bind(this));
       return this;
     };
     v.prototype['not'] = function() {
@@ -396,7 +397,7 @@
       var args = arg_to_array(arguments);
       $.each(args, function(_, v){
         var pos = $.inArray(v, this._d);
-        if(pos==-1) this._d.push(v);
+        if(pos==-1) if(v) this._d.push(v);
         else this._d.splice(pos, pos+1)
       }.bind(this));
       return this
@@ -414,11 +415,8 @@
     };
   });
   window["$chat"] = window["$chat"]();
-  delete window["$chat"]._d;
-  delete window["$chat"]._p;
 
-  window["$page"] = window["$page"] || {};
-  var u = window["$user"];
+  window["$fa"] = window["$fa"] || {};
 
   var get_page_type = function() {
     var p = location.pathname;
@@ -429,12 +427,12 @@
     return "";
   };
 
-  /** $page.type -  type of current page */
-  $page.type = get_page_type(); 
-  $(function(){ $page.type = get_page_type(); });
+  /** $fa.pagetype -  type of current page */
+  $fa.pagetype = get_page_type(); 
+  $(function(){ $fa.pagetype = get_page_type(); });
 
-  /** $page.id - resource id of current page */
-  $page.id = function() {
+  /** $fa.resid - resource id of current page */
+  $fa.resid = function() {
     var p = location.pathname;
     var m = p.match(/^\/[tfc]([1-9][0-9]*)(p[1-9][0-9]*)?-/);
     if (!m) m = p.match(/^\/u([1-9][0-9]*)[a-z]*$/);
@@ -442,8 +440,8 @@
     return +m[1];
   }();
 
-  /** $page.num - page number of current page */
-  $page.num = function() {
+  /** $fa.pagenum - page number of current page */
+  $fa.pagenum = function() {
     var p = location.pathname;
     var m = p.match(/^\/[tf][1-9][0-9]*(p[1-9][0-9]*)-/);
     if (!m) return 0;
@@ -451,32 +449,47 @@
   }();
 
   /** $page.charset - charset of current page */
-  $page.charset = (document.charset ? document.charset : document.characterSet).toLowerCase();
+  $fa.charset = (document.charset ? document.charset : document.characterSet).toLowerCase();
 
   var get_tid = function(){ return $("input[name=tid]:first").val() || ($("a[href*='&tid=']:first").attr("href") || "").replace(/^.*&tid=([a-z0-9]*)?.*$/, "$1"); };
 
-  /** u.tid - user temporary identifier */
-  u.tid = get_tid(); 
-  $(function(){ u.tid = get_tid(); });
+  pid = function(p) { if(p===undefined) return pid(location.search); if($.type(p)=="object") return pid($(p).attr('href')); return parseInt((p.match(/p=(\d+)&/)||[0,0])[1]) };
+  var tid = function(p) { if(p===undefined) return tid(location.pathname); if($.type(p)=="object") return tid($(p).attr('href')); return parseInt((p.match(/\/t(\d+)(?:p\d+)?-/)||[0,0])[1]) };
 
-  u.id = parseInt(((my_getcookie('fa_'+location.host.replace(/\./g,'_')+'_data')||'').match(/"userid";(?:s:[0-9]+:"|i:)([0-9]+)/)||[0,-1])[1]); // id of user 
-  u.guest = (u.id == -1); // is user a guest?
+
+  /** $fa.tid - user temporary identifier */
+  $fa.tid = get_tid(); 
+  $(function(){ $fa.tid = get_tid(); });
+
+  $fa.userid = parseInt(((my_getcookie('fa_'+location.host.replace(/\./g,'_')+'_data')||'').match(/"userid";(?:s:[0-9]+:"|i:)([0-9]+)/)||[0,-1])[1]); // id of user 
+  $fa.isguest = ($fa.userid == -1); // is user a guest?
+
+  $fa.post = function(p) {
+    if(p===undefined) return $fa.post(location.search)||parseInt($('form[method="post"] input[name="p"]').val())||0;
+    if($.type(p)=="object") return $fa.post($(p).attr('href'));
+    return parseInt((p.match(/p=(\d+)&/)||[0,0])[1])
+  };
+  $fa.thread = function(p) {
+    if(p===undefined) return $fa.thread(location.pathname);
+    if($.type(p)=="object") return $fa.thread($(p).attr('href'));
+    return parseInt((p.match(/\/t(\d+)(?:p\d+)?-/)||[0,0])[1]);
+  };
 
   var update_user_data = function(){
     var _ud = _userdata || {};
 
-    u.login = _ud["username"]; // user username (or Anonymous)
-    u.admin = _ud["user_level"] == 1; // is user an admin?
-    u.mod = _ud["user_level"] > 0; // is user a moderator?
-    u.lang = _ud["user_lang"]; // user langage (fr for french, ...)
-    u.avatar = _ud["avatar"]; // user avatar
-    u.num_post = _ud["user_posts"]; // user number of post
-    u.num_pm = _ud["user_nb_privmsg"]; // user number of private message
-    u.num_reputation = _ud["point_reputation"]; // user number of rep points
-    u.rank = window["_lang"] ? _lang["rank_title"] : ""; // rank of the user
-    $page.title = $('h1').text() || $page.title || document.title.replace(/^.*? - /, '');
+    $fa.username = _ud["username"]; // user username (or Anonymous)
+    $fa.isadmin = _ud["user_level"] == 1; // is user an admin?
+    $fa.ismod = _ud["user_level"] > 0; // is user a moderator?
+    $fa.lang = _ud["user_lang"]; // user langage (fr for french, ...)
+    $fa.avatar = _ud["avatar"]; // user avatar
+    $fa.numpost = _ud["user_posts"]; // user number of post
+    $fa.numpm = _ud["user_nb_privmsg"]; // user number of private message
+    $fa.numrep = _ud["point_reputation"]; // user number of rep points
+    $fa.rank = window["_lang"] ? _lang["rank_title"] : ""; // rank of the user
+    $fa.pagetitle = $('h1').text() || $fa.pagetitle || document.title.replace(/^.*? - /, '');
   };
   update_user_data();
   $(function(){ update_user_data() });
-  
+
 })(jQuery);
