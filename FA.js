@@ -239,8 +239,6 @@
         if(topic_id>0) d.resolve(window["$topic"](topic_id));
         else d.reject();
       })
-      if(callback)
-        d.done(callback);
       return d;
     });
     return this;
@@ -373,15 +371,44 @@
 
   var to_extend = {'$user':$user, '$post':$post, '$topic':$topic, '$forum':$forum, '$chat': $chat};
 
+  var arg_to_array = function(arg){
+    var args = $.makeArray(arg); 
+    if (args.length == 1 && $.isArray(args[0])) args = args[0];
+    return args
+  };
+
   $.each(to_extend, function(k, v) {
     $.each(['always', 'done', 'fail'], function(_, m){
       v.prototype[m] = function(arg) { $.each(this._p, function(_, p) { p[m](arg) }); return this };
     });
+    v.prototype['add'] = function() {
+      var args = arg_to_array(arguments);
+      $.merge(this._d, args);
+      this._d = $.grep(this._d, function(v, i){return i==$.inArray(v, this._d)}.bind(this));
+      return this;
+    };
+    v.prototype['not'] = function() {
+      var args = arg_to_array(arguments);
+      this._d = $.grep(this._d, function(v){return -1==$.inArray(v, args)});
+      return this;
+    };
+    v.prototype['toggle'] = function() {
+      var args = arg_to_array(arguments);
+      $.each(args, function(_, v){
+        var pos = $.inArray(v, this._d);
+        if(pos==-1) this._d.push(v);
+        else this._d.splice(pos, pos+1)
+      }.bind(this));
+      return this
+    };
+    v.prototype['empty'] = function() {
+      this._d = [];
+      return this
+    };
     window[k] = function() {
-      var args = $.makeArray(arguments);
-      if (args.length == 1 && $.isArray(args[0])) args = args[0];
-      var ret = new v(args);
-      ret._d = args;
+      var ret = new v();
+      ret._d = [];
+      ret.add.apply(ret, arguments);
       ret._p = [];
       return ret;
     };
@@ -420,7 +447,7 @@
     var p = location.pathname;
     var m = p.match(/^\/[tf][1-9][0-9]*(p[1-9][0-9]*)-/);
     if (!m) return 0;
-    return +m[1];
+    return +m[1].substr(1);
   }();
 
   /** $page.charset - charset of current page */
