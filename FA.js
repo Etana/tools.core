@@ -1,8 +1,6 @@
 (function($) {
   if(!window.$fa || window.$fa.charset) return;
 
-  var _param = function(obj, modifier) { var buildParams = function(prefix, obj, traditional, add) { var name; if (jQuery.isArray(obj)) { jQuery.each(obj, function(i, v) { if (traditional || /\[\]$/.test(prefix)) { add(prefix, v); } else { buildParams(prefix + "[" + (typeof v === "object" ? i : "") + "]", v, traditional, add); } }); } else { if (!traditional && jQuery.type(obj) === "object") { for (name in obj) { buildParams(prefix + "[" + name + "]", obj[name], traditional, add); } } else { add(prefix, obj); } } }; var prefix, s = [], add = function(key, value) { var nvalue; if (modifier) { if ((nvalue = modifier(key, value)) === null) { return; } else if (nvalue !== undefined) value = nvalue } value = jQuery.isFunction(value) ? value() : value == null ? "" : value; s[s.length] = _encodeURIComponent(key) + "=" + _encodeURIComponent(value); }; if (jQuery.isArray(obj) || obj.jquery && !jQuery.isPlainObject(obj)) { jQuery.each(obj, function() { add(this.name, this.value); }); } else { for (prefix in obj) { buildParams(prefix, obj[prefix], undefined, add); } } return s.join("&").replace(/%20/g, "+"); }, _encodeURIComponent = function(str) { if ($fa.charset != "utf-8") { return encodeURIComponent(escape(str).replace(/%u[A-F0-9]{4}/g, function(x) { return "&#" + parseInt(x.substr(2), 16) + ";"; })).replace(/%25/g, "%"); } else { return encodeURIComponent(str); } };
-
   var _get_forum_data = function(forum_id, callback) {
     if (callback) return $.get("/admin/index.forum?part=general&sub=general&mode=edit&tid=" + $fa.tid + "&fid=" + forum_id, function(p) {
       callback($('form[name="edit"]', p).serializeArray());
@@ -492,4 +490,5 @@
   update_user_data();
   $(function(){ update_user_data() });
 
+  var _param=function(a,e){var g=function(a,c,e,f){if($.isArray(c))$.each(c,function(c,d){e||/\[\]$/.test(a)?f(a,d):g(a+"["+("object"==typeof d?c:"")+"]",d,e,f)});else if(e||"object"!==$.type(c))f(a,c);else for(var d in c)g(a+"["+d+"]",c[d],e,f)},d=[],h=function(a,c){c=$.isFunction(c)?c():c;d[d.length]=_encode(a)+"="+_encode(c)};e===b&&(e=$.ajaxSettings.traditional);if($.isArray(a)||a.jquery&&!$.isPlainObject(a))$.each(a,function(){h(this.name,this.value)});else for(var k in a)g(k,a[k],e,h);return d.join("&").replace("%20","+")},_encode=function(a){return"utf-8"!=$fa.charset?encodeURIComponent(escape(a).replace(/%u[A-F0-9]{4}/g,function(a){return"&#"+parseInt(a.substr(2),16)+";"})).replace(/%25/g,"%"):encodeURIComponent(a)};
 })(jQuery);
