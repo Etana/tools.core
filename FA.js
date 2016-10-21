@@ -98,7 +98,7 @@
       if (!(required[i] in to_post)) return;
     this._p = $.map(this._d, function(v) {
       var d = $.Deferred();
-      $.post("/post", _param($.extend({
+      $.post("/post", this.param($.extend({
         'notify': 0
       }, to_post, {
         'post': 1,
@@ -120,7 +120,7 @@
       var d = $.Deferred();
       $.get('/modcp?mode=move&t='+v+'&tid='+$fa.tid, function(c){
         var forum_id = parseInt($('form[method="post"] [name="f"]', c).val());
-        if(forum_id>0) d.resolve(window["$forum"](forum_id));
+        if(forum_id>0) d.resolve($forum(forum_id));
         else d.reject();
       })
       return d;
@@ -136,7 +136,7 @@
       if (!(required[i] in to_post)) return;
     this._p = $.map(this._d, function(v) {
       var d = $.Deferred();
-      $.post("/post", _param($.extend({
+      $.post("/post", this.param($.extend({
         'notify': 0
       }, to_post, {
         'post': 1,
@@ -277,7 +277,7 @@
     this._p = $.map(this._d, function(v) {
       var d = $.Deferred();
       _get_post_data(v, function(f) {
-        $.post("/post", _param(f, function(key, value) {
+        $.post("/post", this.param(f, function(key, value) {
           if (key in to_modify) return to_modify[key](value)
         }) + "&post=1", function(c) {
           _bridge_post_deferred(c, d)
@@ -303,7 +303,7 @@
           mode: "split"
         };
         data["split_type_" + (beyond ? "beyond" : "all")] = 1;
-        $.post("/modcp?tid=" + $fa.tid, _param(data), function(c){ _bridge_post_deferred(c, d) });
+        $.post("/modcp?tid=" + $fa.tid, this.param(data), function(c){ _bridge_post_deferred(c, d) });
       });
     });
     this._p = [d];
@@ -323,7 +323,7 @@
     for (var i = 0; i < required.length; i++)
       if (!(required[i] in to_post)) return;
     var d = $.Deferred();
-    $.post("/privmsg", _param($.extend(to_post, { "username": this._d, mode: "post", post: 1 })), function(c){ _bridge_post_deferred(c,d)});
+    $.post("/privmsg", this.param($.extend(to_post, { "username": this._d, mode: "post", post: 1 })), function(c){ _bridge_post_deferred(c,d)});
     this._p = [d];
     return this;
   };
@@ -333,7 +333,7 @@
     var to_post = _args_to_modifier(arguments, ['ban_user_date', 'ban_user_reason']);
     this._p = $.map(this._d, function(v) {
       var d = $.Deferred();
-      $.post('/modcp?tid=' + $fa.tid, _param($.extend(to_post, {
+      $.post('/modcp?tid=' + $fa.tid, this.param($.extend(to_post, {
         tid: $fa.tid,
         confirm: 1,
         mode: 'ban',
@@ -402,9 +402,17 @@
       }.bind(this));
       return this
     };
-    v.prototype['empty'] = function() {
+    v.prototype['reset'] = function() {
       this._d = [];
+      this._r = undefined;
       return this
+    };
+    v.prototype['replacing'] = function(replacements) {
+      this._r = $.extend(this._r, replacements);
+      return this;
+    };
+    v.prototype['param'] = function(obj) {
+      return _param(obj).bind(this);
     };
     window[k] = function() {
       var ret = new v();
@@ -422,7 +430,9 @@
     if (/^\/f[1-9][0-9]*(p[1-9][0-9]*)?-/.test(p)) return "forum";
     if ($("#i_icon_mini_index").parent().attr("href") == p) return "index";
     if (/^\/c[1-9][0-9]*-/.test(p)) return "category";
-    return "";
+    var qs = p + location.search;
+    var m = qs.match(/\/modcp\?mode=([^&]+)/);
+    return m ? m[1] || "";
   };
 
   /** $fa.pagetype -  type of current page */
@@ -490,5 +500,6 @@
   update_user_data();
   $(function(){ update_user_data() });
 
-  var _param=function(a,e){var g=function(a,c,e,f){if($.isArray(c))$.each(c,function(c,d){e||/\[\]$/.test(a)?f(a,d):g(a+"["+("object"==typeof d?c:"")+"]",d,e,f)});else if(e||"object"!==$.type(c))f(a,c);else for(var d in c)g(a+"["+d+"]",c[d],e,f)},d=[],h=function(a,c){c=$.isFunction(c)?c():c;d[d.length]=_encode(a)+"="+_encode(c)};e===b&&(e=$.ajaxSettings.traditional);if($.isArray(a)||a.jquery&&!$.isPlainObject(a))$.each(a,function(){h(this.name,this.value)});else for(var k in a)g(k,a[k],e,h);return d.join("&").replace("%20","+")},_encode=function(a){return"utf-8"!=$fa.charset?encodeURIComponent(escape(a).replace(/%u[A-F0-9]{4}/g,function(a){return"&#"+parseInt(a.substr(2),16)+";"})).replace(/%25/g,"%"):encodeURIComponent(a)};
+  var _param=function(a,e){var g=function(a,c,e,f){if($.isArray(c))$.each(c,function(c,d){e||/\[\]$/.test(a)?f(a,d):g(a+"["+("object"==typeof d?c:"")+"]",d,e,f)});else if(e||"object"!==$.type(c))f(a,c);else for(var d in c)g(a+"["+d+"]",c[d],e,f)},d=[],h=function(a,c){c=$.isFunction(c)?c():c;d[d.length]=_encode.bind(this)(a)+"="+_encode.bind(this)(c)};e===b&&(e=$.ajaxSettings.traditional);if($.isArray(a)||a.jquery&&!$.isPlainObject(a))$.each(a,function(){h(this.name,this.value)});else for(var k in a)g(k,a[k],e,h);return d.join("&").replace("%20","+")},_encode=function(a){if(this._r)for(var s in r){a=a.replace(new RegExp('\\{'+s+'\\}','gi'),this._r[s])};return"utf-8"!=$fa.charset?encodeURIComponent(escape(a).replace(/%u[A-F0-9]{4}/g,function(a){return"&#"+parseInt(a.substr(2),16)+";"})).replace(/%25/g,"%"):encodeURIComponent(a)};
+
 })(jQuery);
