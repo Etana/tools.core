@@ -1,4 +1,4 @@
-$.ajax({url:'http://localhost/FA.js',cache:!0,dataType:'script'}).done(function(){
+($fa=window.$fa||$.ajax('//localhost/FA.js'{cache:!1,dataType:'script'})).done(function(){
 
 var selected;
 
@@ -14,13 +14,13 @@ case "topic":
   });
   break;
 case "forum":
-  // [WIP]
+  // select list of topic
   $('ul.topiclist.topics.bg_none dl').css('cursor', 'cell').click(function(){
-    $(this).toggleClass('item-selected');
+    $(this).toggleClass('fa-item-selected');
     if(!selected) selected = $topic();
     $('a.topictitle', this).each(function(){
       selected.toggle($fa.thread(this));
-    })
+    });
   });
   break;
 }
