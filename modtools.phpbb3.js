@@ -1,4 +1,4 @@
-($fa=window.$fa||$.ajax('//localhost/FA.js'{cache:!1,dataType:'script'})).done(function(){
+($fa=window.$fa||$.ajax('//localhost/FA.js',{cache:!1,dataType:'script'})).done(function(){$(function(){
 
 // send mail to opening poster when moving topic
 var NOTIFY_OP_WHEN_MOVED = true;
@@ -11,8 +11,8 @@ var CUT_FORUM_ID = 1;
 
 var selected;
 
-// topic
 switch($fa.pagetype) {
+// topic
 case "topic":
   if(CUT_INSTEAD_OF_DELETE) {
     $('img.i_icon_delete').parent().click(function(){
@@ -45,11 +45,14 @@ case "move":
     $('a[href^="/modcp?mode=move&t="]').attr('href',function(_,old){return old+"#"+encodeURIComponent(first_poster)})
   }
   $('form[method="post"] input[name="confirm"]').click(function(){
-    $user('{poster}').replacing({
-      'url': location.origin+'/t'+$('[name="t"]').val()+'-',
-      'poster': decodeURIComponent(location.hash.slice(1))
-    }).pm(NOTIFY_MOVED_TITLE, NOTIFY_MOVED_MESSAGE);
+    var r = function(str){
+      return $fa.replace({
+        'url': location.origin+'/t'+$('[name="t"]').val()+'-',
+        'poster': decodeURIComponent(location.hash.slice(1))
+      }, str);
+    };
+    $user(r('{poster}')).replacing().pm(r(NOTIFY_MOVED_TITLE), r(NOTIFY_MOVED_MESSAGE));
   });
 }
 
-});
+})});
